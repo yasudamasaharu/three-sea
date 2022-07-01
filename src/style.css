@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPMincho&family=PT+Serif:wght@700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 html,
@@ -13,4 +16,62 @@ body {
   top: 0;
   left: 0;
   outline: none;
+  z-index: -1;
 }
+
+header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px;
+}
+
+.logo {
+  font-size: 3rem;
+  font-family: 'PT Serif', serif;
+  color: white;
+}
+
+header ul{
+  display: flex;
+  justify-content: space-between;
+}
+
+header ul li a {
+  font-size: 1.2rem;
+  font-weigth: bold;
+  text-decoration: none;
+}
+header ul li:not(:last-child) {
+  color: red;
+  margin-right: 20px;
+}
+header ul li a{
+  color: white;
+  font-family: 'BIZ UDPMincho', serif;
+}
+
+main {
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+main h1 {
+  font-size: 4rem;
+  font-weight: bold;
+  font-family: 'PT Serif', serif;
+  text-shadow: 1px 1px 3px #000;
+  white-space: nowrap;
+}
+
+main p {
+  font-size: 1.2rem;
+  padding-top: 30px;
+  text-align: center;
+  font-family: 'BIZ UDPMincho', serif;
+  text-shadow: 2px 2px 3px #000;
+}
+

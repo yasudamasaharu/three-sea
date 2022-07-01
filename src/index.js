@@ -2,8 +2,10 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as dat from "lil-gui";
-import vertextShader from './shaders/vertextShader'
-import fragmentShader from './shaders/fragmentShader'
+import vertexShader from './shaders/vertexShader';
+import fragmentShader from './shaders/fragmentShader';
+import bgTexture from "./textures/test.jpg";
+
 
 /**
  * Sizes
@@ -23,15 +25,133 @@ const scene = new THREE.Scene();
  * Textures
  */
 const textureLoader = new THREE.TextureLoader();
+const backgroundTexture = textureLoader.load(bgTexture);
+scene.background = backgroundTexture;
+
 
 // Geometry
-const geometry = new THREE.PlaneGeometry(1, 1, 32, 32);
+const geometry = new THREE.PlaneGeometry(8, 8, 1024, 1024);
+
+
+
+
+
+// 球体の追加
+// const cube = new THREE.SphereGeometry();
+// const cubeMaterial = new THREE.MeshBasicMaterial({
+//   color: "#f00",
+// });
+// const cubeMesh = new THREE.Mesh(cube, cubeMaterial);
+// scene.add(cubeMesh);
+
+
+
+
+
+
+// const sunLight = new THREE.HemisphereLight(0x0fffff, 0xffffff);
+// sunLight.color = new THREE.Color(0xffffff);
+// sunLight.intensity = 0.5;
+// const deb = new dat.GUI({width: 300});
+// deb.add(sunLight, 'intensity').min(0).max(1).step(0.001);
+
+
+
+
+
+
+// color
+const colorObject = {};
+colorObject.depthColor = "#d6e1ea";
+colorObject.surfaceColor = "#fcfcfc";
+
 
 // Material
 const material = new THREE.ShaderMaterial({
-  vertextShader: vertextShader,
+  vertexShader: vertexShader,
   fragmentShader: fragmentShader,
+  uniforms: {
+    uWaveLength: { value: 0.38 },
+    uFrequency: {value: new THREE.Vector2(6.0, 3.2) },
+    uTime: {value:0},
+    uWaveSpeed: {value:0.75},
+    uDepthColor: {value: new THREE.Color(colorObject.depthColor)},
+    uSurfaceColor: {value: new THREE.Color(colorObject.surfaceColor)},
+    uColorOffset: {value: 0.03},
+    uColorMultiplier: {value: 9.0},
+    uSmallWaveElevation: {value: 0.15},
+    uSmallWaveFrequency: {value: 0.32},
+    uSmallWaveSpeed: {value: 0.2},
+  },
 });
+
+// デバッグ機能
+const gui = new dat.GUI({width: 300});
+gui
+  .add(material.uniforms.uWaveLength, "value")
+  .min(0)
+  .max(5)
+  .step(0.001)
+  .name("uWaveLength")
+gui
+  .add(material.uniforms.uFrequency.value, "x")
+  .min(0)
+  .max(30)
+  .step(0.001)
+  .name("uFrequency.X")
+gui
+  .add(material.uniforms.uFrequency.value, "y")
+  .min(0)
+  .max(30)
+  .step(0.001)
+  .name("uFrequency.Y")
+gui
+  .add(material.uniforms.uWaveSpeed, "value")
+  .min(0)
+  .max(10)
+  .step(0.001)
+  .name("uWaveSpeed")
+gui
+  .add(material.uniforms.uColorOffset, "value")
+  .min(0)
+  .max(1)
+  .step(0.001)
+  .name("uColorOffset")
+gui
+  .add(material.uniforms.uColorMultiplier, "value")
+  .min(0)
+  .max(10)
+  .step(0.001)
+  .name("uColorMultiplier")
+gui
+  .add(material.uniforms.uSmallWaveElevation, "value")
+  .min(0)
+  .max(10)
+  .step(0.001)
+  .name("uSmallElevation")
+gui
+  .add(material.uniforms.uSmallWaveFrequency, "value")
+  .min(0)
+  .max(30)
+  .step(0.001)
+  .name("uSmallWaveFrequency")
+gui
+  .add(material.uniforms.uSmallWaveSpeed, "value")
+  .min(0)
+  .max(4)
+  .step(0.001)
+  .name("uSmallWaveSpeed")
+// 色のデバッグ
+gui.addColor(colorObject, "depthColor").onChange(() => {
+  material.uniforms.uDepthColor.value.set(colorObject.depthColor)
+});
+gui.addColor(colorObject, "surfaceColor").onChange(() => {
+  material.uniforms.uSurfaceColor.value.set(colorObject.surfaceColor)
+});
+
+
+// UIデバッグの表示非表示の切り替え
+gui.show(false);
 
 // Mesh
 const mesh = new THREE.Mesh(geometry, material);
@@ -56,7 +176,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(0.2, 0.7, 0.7);
+camera.position.set(0.0, 0.23, 0);
 scene.add(camera);
 
 // Controls
@@ -80,6 +200,15 @@ const clock = new THREE.Clock();
 const animate = () => {
   //時間取得
   const elapsedTime = clock.getElapsedTime();
+  material.uniforms.uTime.value = elapsedTime;
+
+  // 視点を円周させる
+  camera.position.x = Math.sin(elapsedTime * 0.2) * 3.0;
+  camera.position.z = Math.cos(elapsedTime * 0.2) * 3.0;
+
+  // 視点を上下に動かす
+  camera.lookAt(Math.cos(elapsedTime) * 0.3, Math.sin(elapsedTime) * 0.02, Math.sin(elapsedTime));
+
 
   controls.update();
 
